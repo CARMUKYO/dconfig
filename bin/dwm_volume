@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+## Copyright (C) 2020-2023 Aditya Shakya <adi1090x@gmail.com>
+##
+## Script to manage speaker volume on Archcraft.
+
+# Icons
+
+# Get Volume
+get_volume() {
+	echo "`pulsemixer --get-volume | cut -d' ' -f1`"
+}
+
+# Increase Volume
+inc_volume() {
+	[[ `pulsemixer --get-mute` == 1 ]] && pulsemixer --unmute
+	pulsemixer --max-volume 100 --change-volume +5 
+}
+
+# Decrease Volume
+dec_volume() {
+	[[ `pulsemixer --get-mute` == 1 ]] && pulsemixer --unmute
+	pulsemixer --max-volume 100 --change-volume -5
+}
+
+# Toggle Mute
+toggle_mute() {
+		pulsemixer --toggle-mute
+}
+
+# Execute accordingly
+if [[ -x `which pulsemixer` ]]; then
+	if [[ "$1" == "--get" ]]; then
+		get_volume
+	elif [[ "$1" == "--inc" ]]; then
+		inc_volume
+	elif [[ "$1" == "--dec" ]]; then
+		dec_volume
+	elif [[ "$1" == "--toggle" ]]; then
+		toggle_mute
+	else
+		echo $(get_volume)%
+	fi
+else
+	echo "'pulsemixer' is not installed."
+fi
