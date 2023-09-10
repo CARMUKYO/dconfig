@@ -33,7 +33,7 @@ static const Rule rules[] = {
 	{ "TelegramDesktop",    NULL,     NULL,           0,         1,          0,           0,        -1 },
 	{ "obs",                NULL,     NULL,           0,         1,          0,           0,        -1 },
 	{ "Lutris",             NULL,     NULL,           0,         1,          0,           0,        -1 },
-	{ "firefox",   		NULL,     NULL,           1 << 2,    0,          0,          -1,        -1 },
+	{ "firefox",   		    NULL,     NULL,           0,         0,          0,          -1,        -1 },
 	{ "St",                 NULL,     NULL,           0,         0,          1,           0,        -1 },
 	{ NULL,                 NULL,     "Event Tester", 0,         0,          0,           1,        -1 }, /* xev */
 };
@@ -52,6 +52,7 @@ static const Layout layouts[] = {
 
 /* key definitions */
 #define MODKEY Mod4Mask
+#define ALTKEY Mod1Mask
 #define TAGKEYS(KEY,TAG) \
 	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
@@ -66,7 +67,29 @@ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() 
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont};
 static const char *termcmd[]  = { "st", NULL };
 
+
+#include <X11/XF86keysym.h>
+
+/* Screenshot */
+static const char *shotin5[]            = { "dwm_screenshot", "--in5", NULL };
+static const char *shotin10[]           = { "dwm_screenshot", "--in10", NULL };
+static const char *shotwin[]            = { "dwm_screenshot", "--win", NULL };
+static const char *shotarea[]           = { "dwm_screenshot", "--area", NULL };
+
+
+
 static Key keys[] = {
+    // Hardware Keys -----------
+    { 0,                        XF86XK_AudioLowerVolume,    spawn, SHCMD("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-; kill -44 $(pidof dwmblocks)") },
+    { 0,                        XF86XK_AudioRaiseVolume,    spawn, SHCMD("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+; kill -44 $(pidof dwmblocks)") },
+    
+    // Print Keys -----------
+    { 0,                        XK_Print,                   spawn, {.v = (const char*[]){ "dwm_screenshot", "--now", NULL } } },
+    { ALTKEY,                   XK_Print,                   spawn, {.v = shotin5 } },
+    { ShiftMask,                XK_Print,                   spawn, {.v = shotin10 } },
+    { ControlMask,              XK_Print,                   spawn, {.v = shotwin } },                                 
+    { MODKEY,                   XK_Print,                   spawn, {.v = shotarea } },
+
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_j,      setmfact,       {.f = +0.05} },
 	{ MODKEY,                       XK_l,      focusstack,     {.i = -1 } },
@@ -103,10 +126,10 @@ static Key keys[] = {
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
 	{ MODKEY|ShiftMask,		        XK_q,      quit,           {0} },
-	{ MODKEY,			XK_Down,   spawn,	   SHCMD("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-; kill -44 $(pidof dwmblocks)") },
-	{ MODKEY,			XK_Up,     spawn,	   SHCMD("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+; kill -44 $(pidof dwmblocks)") },
+	{ MODKEY,			            XK_Down,   spawn,	   SHCMD("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-; kill -44 $(pidof dwmblocks)") },
+	{ MODKEY,			            XK_Up,     spawn,	   SHCMD("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+; kill -44 $(pidof dwmblocks)") },
 	{MODKEY,                        XK_Right,   spawn,         {.v = (const char*[]){ "xbacklight", "-inc", "5", NULL } } },	
-	{MODKEY, 			XK_Left,    spawn,         {.v = (const char*[]){ "xbacklight", "-dec", "5", NULL } } },
+	{MODKEY, 			            XK_Left,    spawn,         {.v = (const char*[]){ "xbacklight", "-dec", "5", NULL } } },
 };
 
 /* button definitions */
